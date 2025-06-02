@@ -21,7 +21,7 @@ model = ChatMistralAI(model="mistral-large-latest")
 
 # Set page config
 st.set_page_config(
-    page_title="RFP Chatbot",
+    page_title="ربات درخواست پیشنهاد",
     page_icon="🤖",
     layout="centered"
 )
@@ -32,12 +32,17 @@ st.markdown("""
         .stApp {
             background-color: #EBEBEB;
         }
+        /* Add support for RTL text */
+        div[data-testid="stMarkdownContainer"] {
+            direction: rtl;
+            text-align: right;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # Title and description
-st.title("RFP Generator Chatbot")
-st.markdown("Chat with me to create your Request for Proposal (RFP). I'll guide you through the process! 💬")
+st.title("ربات تولید درخواست پیشنهاد (RFP)")
+st.markdown("با من گفتگو کنید تا درخواست پیشنهاد (RFP) خود را ایجاد کنید. من شما را در این فرآیند راهنمایی خواهم کرد! 💬")
 
 # Initialize session state
 if 'messages' not in st.session_state:
@@ -50,7 +55,7 @@ if 'responses' not in st.session_state:
     st.session_state.responses = {}
 # dict to string function
 def dict_to_context(user_info):
-    context = "User Information:\n"
+    context = "اطلاعات کاربر:\n"
     for key, value in user_info.items():
         context += f"{key.capitalize()}: {value}\n"
     return context
@@ -69,43 +74,43 @@ def clean_markdown(text):
 QUESTIONS = [
     {
         'key': 'project_description',
-        'question': "Hi! I'm here to help you create your RFP. First, could you tell me about your project? What are you looking to accomplish? 🎯"
+        'question': "سلام! من اینجا هستم تا به شما در ایجاد RFP کمک کنم. لطفاً درباره پروژه خود توضیح دهید. چه هدفی را دنبال می‌کنید؟ 🎯"
     },
     
     {
         'key': 'timeline',
-        'question': "Thanks for sharing that! When would you like to start this project? You can say something like 'within 3 months' or 'after 60 days' 📅"
+        'question': "ممنون از توضیحات شما! چه زمانی می‌خواهید این پروژه را شروع کنید؟ می‌توانید مثلاً بگویید 'در عرض ۳ ماه' یا 'بعد از ۶۰ روز' 📅"
     },
     {
         'key': 'company_name',
-        'question': "Great! Now, what's your company name? 🏢"
+        'question': "عالی! نام شرکت شما چیست؟ 🏢"
     },
     {
         'key': 'business_type',
-        'question': "Could you tell me a bit about what your business does? 💼"
+        'question': "می‌توانید کمی درباره فعالیت کسب و کارتان توضیح دهید؟ 💼"
     },
     {
         'key': 'employee_count',
-        'question': "Last question! Approximately how many employees are in your organization? 👥"
+        'question': "آخرین سؤال! تقریباً چند نفر در سازمان شما مشغول به کار هستند؟ 👥"
     }
 ]
 
 def generate_rfp():
     return f"""
-REQUEST FOR PROPOSAL (RFP)
+درخواست پیشنهاد (RFP)
 
-Date: {datetime.now().strftime('%B %d, %Y')}
+تاریخ: {datetime.now().strftime('%B %d, %Y')}
 
-COMPANY INFORMATION
-Company Name: {st.session_state.responses.get('company_name', '')}
-Business Type: {st.session_state.responses.get('business_type', '')}
-Number of Employees: {st.session_state.responses.get('employee_count', '')}
+اطلاعات شرکت
+نام شرکت: {st.session_state.responses.get('company_name', '')}
+نوع کسب و کار: {st.session_state.responses.get('business_type', '')}
+تعداد کارکنان: {st.session_state.responses.get('employee_count', '')}
 
-PROJECT OVERVIEW
+شرح پروژه
 {st.session_state.responses.get('project_description', '')}
 
-TIMELINE
-Desired Start: {st.session_state.responses.get('timeline', '')}
+زمان‌بندی
+زمان شروع مورد نظر: {st.session_state.responses.get('timeline', '')}
     """
 
 
@@ -157,14 +162,14 @@ elif st.session_state.current_question == len(QUESTIONS):
     context = dict_to_context(st.session_state.responses)
     print(context)
     with st.chat_message("assistant"):
-        st.write("Great! I've gathered all the information. Here's your generated RFP! 🎉")
-    rfp_prompt = f"""You are an expert in creating professional Request for Proposals (RFPs). Based on the following user-provided information, generate a comprehensive, polished, and professional RFP document. Use the provided data as the foundation, but creatively expand and enhance the responses to ensure they are complete, detailed, and suitable for a formal RFP. Fill in any gaps with reasonable assumptions that align with the user's input, maintaining a professional tone and structure. The RFP should include sections such as an introduction, project overview, goals and objectives, scope of work, timeline, company background, and submission requirements. Ensure the RFP is engaging, clear, and tailored to attract qualified vendors.
+        st.write("عالی! من تمام اطلاعات را جمع‌آوری کردم. این RFP تولید شده شماست! 🎉")
+    rfp_prompt = f"""You are an expert in creating professional Request for Proposals (RFPs). Based on the following user-provided information, generate a comprehensive, polished, and professional RFP document. Use the provided data as the foundation, but creatively expand and enhance the responses to ensure they are complete, detailed, and suitable for a formal RFP. Fill in any gaps with reasonable assumptions that align with the user's input, maintaining a professional tone and structure. The RFP should include sections such as an introduction, project overview, goals and objectives, scope of work, timeline, company background, and submission requirements. Ensure the RFP is engaging, clear, and tailored to attract qualified vendors. it must be in persian language.
 
 
 
 **Instructions**:
 1. **Enhance User Responses**: Use the provided data as a starting point. Expand on the project description and goals to make them specific, actionable, and comprehensive. For example, if the user provides a vague project description, infer reasonable details based on the business type and goals.
-2. **Incorporate Company Context**: Use the company name, business type, and employee count to craft a detailed company background section. Highlight the company's mission, industry, and scale to provide context for vendors.
+2. **Incorporate Company Context**: Use the company name, business type, and employee count to craft a detailed company background section. Highlight the company's mission, industry, and scale to provide context for vendors, put place holder for company contact detaisls.
 3. **Define Scope of Work**: Based on the project description and goals, outline a clear scope of work, including deliverables, key requirements, and any technical or functional specifications that align with the project.
 4. **Timeline and Milestones**: Use the provided timeline to create a detailed project schedule with realistic milestones. If the timeline is vague (e.g., "within 3 months"), propose a reasonable start date and key phases.
 5. **Professional Structure**: Organize the RFP with the following sections:
@@ -172,14 +177,13 @@ elif st.session_state.current_question == len(QUESTIONS):
    - **Company Background**: Describe the company based on the provided name, business type, and employee count, adding relevant details about its mission and industry.
    - **Project Overview**: Expand on the project description to provide a clear understanding of the project's purpose and scope.
    - **Goals and Objectives**: List specific, measurable goals based on the user's input, adding clarity and detail as needed.
-   - **Scope of Work**: Detail the deliverables, requirements, and expectations for the project.
-   - **Timeline**: Provide a detailed schedule with milestones based on the user's timeline input.
    - **Submission Requirements**: Specify how vendors should submit proposals, including format, deadline (assume 30 days from the RFP release unless otherwise specified), and contact information.
    - **Evaluation Criteria**: Outline how proposals will be evaluated (e.g., cost, experience, alignment with goals).
 6. **Creative Additions**: Add reasonable details to make the RFP robust, such as industry-specific requirements, stakeholder involvement, or potential challenges, while staying true to the user's input.
 7. **Tone and Style**: Use a professional, engaging, and concise tone. Avoid jargon unless appropriate for the business type, and ensure the RFP is accessible to a wide range of potential vendors.
 8. **Assumptions**: If any information is missing or vague, make logical assumptions based on the business type and project context. For example, a tech company might require software development, while a retail business might need a marketing solution.
 9. **Output Format**: Provide the RFP as a well-structured document with clear headings and concise paragraphs. Use bullet points or numbered lists where appropriate for clarity.
+
 
 
 .
@@ -195,19 +199,19 @@ Here is the user-provided information:
     col1, col2 = st.columns(2)
     with col1:
         st.download_button(
-            "Download as Text",
+            "دانلود به صورت متن",
             rfp_content,
             file_name="rfp_document.txt",
             mime="text/plain"
         )
     with col2:
         st.download_button(
-            "Download as JSON",
+            "دانلود به صورت JSON",
             json.dumps(st.session_state.responses, indent=2),
             file_name="rfp_data.json",
             mime="application/json"
         )
         
-    if st.button("Start Over 🔄"):
+    if st.button("شروع مجدد 🔄"):
         st.session_state.clear()
         st.rerun() 
